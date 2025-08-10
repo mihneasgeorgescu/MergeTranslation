@@ -1,0 +1,17 @@
+name: Build Windows EXE
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install --upgrade pyinstaller
+      - run: pyinstaller --onefile --name MergeTranslationFiles MergeTranslationFiles.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MergeTranslationFiles-win
+          path: dist/MergeTranslationFiles.exe
