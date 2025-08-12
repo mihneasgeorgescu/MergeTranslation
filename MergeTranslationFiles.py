@@ -100,13 +100,17 @@ def apply_widths_surgically(source_xml_path: str, width_map: Dict[Tuple[str, str
                     new_width = width_map[key]
 
                     # Replace existing Width or insert a new one
-                    if width_attr_re.search(tag):
-                        old_width = width_attr_re.search(tag).group(1)
-                        if old_width == "170":
-                            # Replace only the value part
-                            def _repl(wm):
-                                return f'Width="{new_width}"'
-                            new_tag = width_attr_re.sub(_repl, tag, count=1)
+                    old_width_match = width_attr_re.search(tag)
+                    if old_width_match and old_width_match.group(1) != "170":
+                        out_parts.append(tag)
+                        last_idx = m.end()
+                        continue
+
+                    if old_width_match:
+                        # Replace only the value part
+                        def _repl(wm):
+                            return f'Width="{new_width}"'
+                        new_tag = width_attr_re.sub(_repl, tag, count=1)
                     else:
                         # Insert Width="..." before Height= if present, else before the closing '/>' or '>'
                         insert_pos = None
